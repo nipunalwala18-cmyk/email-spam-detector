@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spam Detector</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+
+  <header>
+    <h1>Spam Detector</h1>
+  </header>
+
+
+  <main class="container">
+
+    <section class="card">
+      <h2>Check Text</h2>
+      <p class="desc">Enter a message to check whether it is Spam or Not Spam.</p>
+      <textarea id="text_input" rows="4" placeholder="Type your message here"></textarea>
+      <button onclick="checkText()">Check Text</button>
+      <div id="text_result" class="result"></div>
+    </section>
+
+    <!-- Section: Image Check -->
+    <section class="card">
+      <h2>Check Image</h2>
+      <p class="desc">Upload an image containing text.</p>
+      <div class="row">
+        <input type="file" id="image_input" accept="image/*"/>
+        <button onclick="checkImage()">Check Image</button>
+      </div>
+      <div id="image_result" class="result"></div>
+    </section>
+
+  </main>
+
+ 
+  <footer>
+    <p>  Built with Flask, ML & OCR | Spam Detector © 2025</p>
+  </footer>
+
+  
+  <script>
+    async function checkText() 
+    {
+      const text = document.getElementById("text_input").value;
+      const resultBox = document.getElementById("text_result");
+
+      if (!text.trim()) 
+      {
+        resultBox.className = "result status-warn";
+        resultBox.innerText = "Please enter some text!";
+        return;
+      }
+
+      try {
+        const response = await fetch("/predict_text", 
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
+        });
+
+        const data = await response.json();
+        resultBox.className = "result " + (data.prediction === "SPAM" ? "status-error" : "status-ok");
+        resultBox.innerText = `Prediction: ${data.prediction}\nConfidence: ${data.confidence}`;
+      } catch (error) 
+      {
+        resultBox.className = "result status-error";
+        resultBox.innerText = "Error checking text!";
+        console.error(error);
+      }
+    }
+
+    async function checkImage() {
+      const file = document.getElementById("image_input").files[0];
+      const resultBox = document.getElementById("image_result");
+
+      if (!file) {
+        resultBox.className = "result status-warn";
+        resultBox.innerText = "⚠️ Please upload an image!";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("/predict_image", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+        resultBox.className = "result " + (data.prediction === "SPAM" ? "status-error" : "status-ok");
+        resultBox.innerText =
+          `Prediction: ${data.prediction}\nConfidence: ${data.confidence}\n\nExtracted Text:\n${data.input}`;
+      } catch (error) {
+        resultBox.className = "result status-error";
+        resultBox.innerText = "❌ Error checking image!";
+        console.error(error);
+      }
+    }
+  </script>
+
+</body>
+</html>
