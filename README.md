@@ -1,6 +1,4 @@
-﻿# Spam_Detector
-
-# Email Spam Detector using XGBoost
+﻿# Email Spam Detector using XGBoost
 
 An Email Spam Detection system built using **Machine Learning** and **XGBoost** with Natural Language Processing (NLP). The application classifies email messages as **Spam** or **Not Spam (Ham)** through a simple Flask web interface.
 
