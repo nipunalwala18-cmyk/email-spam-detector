@@ -157,7 +157,6 @@ Not Spam
 - Add email attachment analysis
 - Improve accuracy with BERT/Transformer models
 - Support multilingual spam detection
-- Real-time email filtering
 
 ---
 
